@@ -11,7 +11,7 @@ def receive():
 	plt.axis([-100, 100, -100, 100])
 	plt.plot(0, 0, 'bo')
 	plt.draw()
-	colors = ['ro', 'go', 'mo', 'yo', 'co']
+	colors = ['r.', 'g.', 'm.', 'y.', 'c.']
 	clr = 0
 	while 1:
 
@@ -26,13 +26,10 @@ def receive():
 		x = math.sin(ang) * dist  #convert from polar coordinates
 		y = math.cos(ang) * dist  #to cartesian coodinates
 
-
 		if  abs(ang) == math.radians(85):  #cycle the color each sweep
-			clr += 1
-			if clr == len(colors):
-				clr = 0
+			clr = (clr + 1)*(clr != len(colors) - 1)
 
-		plt.plot(x, y, colors[clr])  #plot the point as a red circle
+		plt.plot(x, y, colors[clr])  #plot the point
 		plt.draw()  #update plot
 
 
