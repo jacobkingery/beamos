@@ -14,7 +14,7 @@ float aveDist;
 void setup() { 
   Serial.begin(9600);  //initialize serial communication
 
-  panServo.attach(panPin);  //attaches the pan servo
+  panServo.attach(panPin);  //attach the pan servo
   panServo.write(5);  //turn servo to 5 degrees
   
   establishConnection();
