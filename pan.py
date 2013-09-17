@@ -31,7 +31,7 @@ def receive():
 
 		if  abs(ang) == math.radians(85):  #cycle the color each sweep
 			clr = (clr + 1)*(clr != len(colors) - 1)
-			plt.savefig('test{0}.png'.format(sweep)) 
+			plt.savefig('./Results/test{0}.png'.format(sweep)) 
 			sweep+=1
 
 		plt.plot(x, y, colors[clr])  #plot the point
