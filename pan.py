@@ -6,13 +6,14 @@ import matplotlib.pyplot as plt
 def receive():
 	plt.ion()
 	plt.show()
-	plt.xlabel('X')
-	plt.ylabel('Y')
+	plt.xlabel('X (cm)')
+	plt.ylabel('Y (cm)')
 	plt.axis([-100, 100, -100, 100])
 	plt.plot(0, 0, 'bo')
 	plt.draw()
 	colors = ['r.', 'g.', 'm.', 'y.', 'c.']
 	clr = 0
+	sweep = 0
 	while 1:
 
 		raw_data = ser.readline().strip().split('@')
@@ -23,16 +24,16 @@ def receive():
 
 		ang = -math.radians(int(raw_data[1]) - 90)  #convert degrees to radians and shift so that the range is -90 to 90 degrees
 
-		x = math.sin(ang) * dist  #convert from polar coordinates
-		y = math.cos(ang) * dist  #to cartesian coodinates
+		x = math.sin(ang) * dist * 2.54  #convert from polar coordinates to
+		y = math.cos(ang) * dist * 2.54  #cartesian coodinates and inches to mm
 
 		if  abs(ang) == math.radians(85):  #cycle the color each sweep
 			clr = (clr + 1)*(clr != len(colors) - 1)
+			plt.savefig('test{0}.png'.format(sweep)) 
+			sweep+=1
 
 		plt.plot(x, y, colors[clr])  #plot the point
 		plt.draw()  #update plot
-
-
 
 
 if __name__ == '__main__':
