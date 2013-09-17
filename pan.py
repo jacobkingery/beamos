@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 def receive():
 	plt.ion()
 	plt.show()
+	plt.title('2D Top-Down Representation')
 	plt.xlabel('X (cm)')
 	plt.ylabel('Y (cm)')
-	plt.axis([-100, 100, -100, 100])
+	plt.axis([-100, 100, -10, 100])
+	plt.axes().set_aspect('equal')
 	plt.plot(0, 0, 'bo')
 	plt.draw()
 	colors = ['r.', 'g.', 'm.', 'y.', 'c.']
