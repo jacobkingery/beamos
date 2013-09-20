@@ -2,20 +2,27 @@ import serial
 import time
 import math
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 def receive():
+	fig = plt.figure()
+	ax = fig.add_subplot(111, projection='3d')
 	plt.ion()
 	plt.show()
-	plt.title('2D Top-Down Representation')
-	plt.xlabel('X (cm)')
-	plt.ylabel('Y (cm)')
-	plt.axis([-100, 100, -10, 100])
-	plt.axes().set_aspect('equal')
-	plt.plot(0, 0, 'bo')
+	plt.title('3D View')
+	ax.set_xlabel('X (cm)')
+	ax.set_ylabel('Y (cm)')
+	ax.set_zlabel('Z (cm)')
+	ax.autoscale(enable=False)
+	ax.set_xlim(-100, 100)
+	ax.set_ylim(-10, 100)
+	ax.set_zlim(-50, 50)
+	ax.scatter(0, 0, 0, s=20, c='b')
 	plt.draw()
-	colors = ['r.', 'g.', 'm.', 'y.', 'c.']
+	colors = ['r', 'g', 'm', 'y', 'c']
 	clr = 0
 	sweep = 0
+	trigger = 0
 	while 1:
 
 		raw_data = ser.readline().strip().split('@')
@@ -33,12 +40,17 @@ def receive():
 		x = math.sin(theta) * xyDist * 2.54  #convert from polar coordinates to
 		y = math.cos(theta) * xyDist * 2.54  #cartesian coodinates and inches to mm
 
-		if  abs(theta) == math.radians(85):  #cycle the color each sweep
-			clr = (clr + 1)*(clr != len(colors) - 1)
-			plt.savefig('./Results/test{0}.png'.format(sweep)) 
-			sweep+=1
 
-		plt.plot(x, y, colors[clr])  #plot the point
+		if  abs(theta) == math.radians(85):  #cycle the color each sweep
+			trigger += 1
+			if trigger == 1:
+				clr = (clr + 1)*(clr != len(colors) - 1)
+				plt.savefig('./Results/test{0}.png'.format(sweep)) 
+				sweep += 1
+		if  abs(theta) == math.radians(45):
+			trigger = 0
+
+		ax.scatter(x, y, z, s=20, c='g', marker='.')  #plot the point
 		plt.draw()  #update plot
 
 

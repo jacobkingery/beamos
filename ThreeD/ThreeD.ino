@@ -9,9 +9,9 @@ const int panPin = 9;
 const int tiltPin = 10;
 const int sensorPin = A0;
 
-int panPos = 5;    //servo pan position 
-int tiltPos = 45;
-float dist[5];
+int panPos = 5;  //pan position 
+int tiltPos = 45;  //tilt position
+int totDist;
 float aveDist;
  
 void setup() { 
@@ -38,12 +38,13 @@ void establishConnection() {
 
 
 void shoot() {
+  totDist = 0;
   delay(50);
   for (int i=0; i<5; i++) {
-    dist[i] = analogRead(sensorPin);
+    totDist += analogRead(sensorPin);
     delay(50);
   }
-  aveDist = (dist[0] + dist[1] + dist[2] + dist[3] + dist[4]) / 5.0;
+  aveDist = totDist / 5.0;
   Serial.print(aveDist);
   Serial.print('@');
   Serial.print(panPos);
@@ -55,13 +56,13 @@ void loop() {
   for (panPos=5; panPos<175; panPos++) {
     panServo.write(panPos);
     if (panPos%2 != 0) {
-      for (tiltPos=45; tiltPos<=100; panPos++) {
+      for (tiltPos=45; tiltPos<=100; tiltPos++) {
         tiltServo.write(tiltPos);
         shoot();
       }
     }
     else {
-      for (tiltPos=100; tiltPos>=45; panPos--) {
+      for (tiltPos=100; tiltPos>=45; tiltPos--) {
         tiltServo.write(tiltPos);
         shoot();
       }
@@ -71,13 +72,13 @@ void loop() {
   for (panPos=175; panPos>5; panPos--) {
     panServo.write(panPos);
     if (panPos%2 != 0) {
-      for (tiltPos=45; tiltPos<=100; panPos++) {
+      for (tiltPos=45; tiltPos<=100; tiltPos++) {
         tiltServo.write(tiltPos);
         shoot();
       }
     }
     else {
-      for (tiltPos=100; tiltPos>=45; panPos--) {
+      for (tiltPos=100; tiltPos>=45; tiltPos--) {
         tiltServo.write(tiltPos);
         shoot();
       }
