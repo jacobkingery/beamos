@@ -41,15 +41,18 @@ def receive():
 
 		dist = float(raw_data[0])  #get calculated distance
 
-		theta = -math.radians(int(raw_data[1]) - 90)  #convert degrees to radians and shift
-		phi = math.radians(int(raw_data[2]) - 90)  #so that the range is -90 to 90 degrees
+		#convert degrees to radians and shift so that the range is 
+		#-90 to 90 degrees
+		theta = -math.radians(int(raw_data[1]) - 90)
+		phi = math.radians(int(raw_data[2]) - 90)
 
 		xyDist = math.cos(phi) * dist  #find distance in xy plane
 
-		z.append(math.sin(phi) * dist * 2.54)  #convert from spherical coordinates
-		x.append(math.sin(theta) * xyDist * 2.54)  #to cartesian coordinates
-		y.append(math.cos(theta) * xyDist * 2.54)  #and inches to cm
-
+		#convert from spherical coordinates to cartesian
+		#coordinates and inches to cm
+		z.append(math.sin(phi) * dist * 2.54)
+		x.append(math.sin(theta) * xyDist * 2.54)
+		y.append(math.cos(theta) * xyDist * 2.54)
 
 		#check for when it has completed a full sweep
 		if  abs(theta)==math.radians(70) and trigger==0:

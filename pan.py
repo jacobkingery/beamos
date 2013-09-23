@@ -40,8 +40,10 @@ def receive():
 		#-90 to 90 degrees
 		ang = -math.radians(int(raw_data[1]) - 90)
 
-		x = math.sin(ang) * dist * 2.54  #convert from polar coordinates to
-		y = math.cos(ang) * dist * 2.54  #cartesian coodinates and inches to cm
+		#convert from polar coordinates to cartesian
+		#coordinates and inches to cm
+		x = math.sin(ang) * dist * 2.54
+		y = math.cos(ang) * dist * 2.54
 
 		#cycle the color and save the figure each sweep
 		if  abs(ang) == math.radians(85):
