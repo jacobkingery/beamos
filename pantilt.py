@@ -11,61 +11,66 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 def receive():
+	#receive data from arduino and plot
+
+	#set up figure
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
-	# plt.ion()
-	# plt.show()
-	plt.title('3D View')
-	ax.set_xlabel('X (cm)')
+	plt.title('3D View')  #set title
+	ax.set_xlabel('X (cm)')  #set axes labels
 	ax.set_ylabel('Y (cm)')
 	ax.set_zlabel('Z (cm)')
 	ax.autoscale(enable=False)
-	ax.set_xlim(-100, 100)
+	ax.set_xlim(-100, 100)  #set axes ranges
 	ax.set_ylim(-10, 100)
 	ax.set_zlim(-50, 50)
-	ax.scatter(0, 0, 0, s=30, c='b')
-	# plt.draw()
-	colors = ['r', 'g', 'm', 'y', 'c']
-	clr = 0
-	sweep = 0
-	trigger = 0
+	ax.scatter(0, 0, 0, s=30, c='b')  #plot origin
+
+	trigger = -1  #trigger to stop after one sweep
+
+	#initialize lists for coordinates
 	x = []
 	y = []
 	z = []
 
-	for i in range(35*6):
-		raw_data = ser.readline().strip().split('@')
+	while trigger != 1:
 
-		# raw_dist = float(raw_data[0])
-		# w = (raw_dist - 280.0)/120.0
-		# dist = .62*w**4 - 2.4*w**3 + 3.4*w**2 - 7.3*w + 18
-		dist = float(raw_data[0])
+		#read data from arduino, split by '@' to get a list of
+		#distance, pan angle, and tilt angle
+		raw_data = ser.readline().strip().split('@')  
 
-		theta = -math.radians(int(raw_data[1]) - 90)  #convert degrees to radians and shift so that the range is -90 to 90 degrees
-		phi = math.radians(int(raw_data[2]) - 90)
+		dist = float(raw_data[0])  #get calculated distance
 
-		xyDist = math.cos(phi) * dist
+		theta = -math.radians(int(raw_data[1]) - 90)  #convert degrees to radians and shift
+		phi = math.radians(int(raw_data[2]) - 90)  #so that the range is -90 to 90 degrees
 
-		z.append(math.sin(phi) * dist * 2.54)
-		x.append(math.sin(theta) * xyDist * 2.54)  #convert from polar coordinates to
-		y.append(math.cos(theta) * xyDist * 2.54)  #cartesian coodinates and inches to mm
+		xyDist = math.cos(phi) * dist  #find distance in xy plane
 
-		# if  abs(theta) == math.radians(85):  #cycle the color and save the figure each sweep
-		# 	trigger += 1
-		# 	if trigger == 1:
-		# 		clr = (clr + 1)*(clr != len(colors) - 1)
-		# 		plt.savefig('./Results/sweep{0}.png'.format(sweep)) 
-		# 		sweep += 1
-		# if abs(theta) != math.radians(85):
-		# 	trigger = 0
+		z.append(math.sin(phi) * dist * 2.54)  #convert from spherical coordinates
+		x.append(math.sin(theta) * xyDist * 2.54)  #to cartesian coordinates
+		y.append(math.cos(theta) * xyDist * 2.54)  #and inches to cm
+
+
+		#check for when it has completed a full sweep
+		if  abs(theta)==math.radians(70) and trigger==0:
+			trigger += 1
+		if abs(theta) == 0:
+			trigger = 0
+
 	print('Done receiving')
+
+	#close the serial connection and open a new one so that the arduino resets
 	ser.close()
 	ser2 = serial.Serial('/dev/ttyACM0', 9600)
-	ax.scatter(x, y, z, s=20, c=colors[clr], marker='o')  #plot the point
-	plt.show()  #update plot
-	print('Done plotting')
+	ser2.close()
+	#plot data
+	ax.scatter(x, y, z, s=20, c='r', marker='o')
+	plt.show()
+
 
 def establishContact():
+	#flush buffer and wait for ready signal from arduino, 
+	#then send own ready signal
 	time.sleep(.5)
 	ser.flushInput()
 	time.sleep(1)
@@ -75,9 +80,7 @@ def establishContact():
 
 
 if __name__ == '__main__':
-	ser = serial.Serial('/dev/ttyACM0', 9600)
+	ser = serial.Serial('/dev/ttyACM0', 9600)  #open serial connection
 	establishContact()
 	print('Contact established, receiving data...')
 	receive()
-	time.sleep(1)
-

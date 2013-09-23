@@ -1,35 +1,50 @@
+'''
+Principles of Engineering, Fall 2013
+Lab 1:  DIY LIDAR
+Jacob Kingery and Myles Cooper
+'''
+
 import serial
 import time
 import math
 import matplotlib.pyplot as plt
 
 def receive():
+	#receive data from arduino and plot
+
+	#set up figure
 	plt.ion()
 	plt.show()
-	plt.title('2D Top-Down Representation')
-	plt.xlabel('X (cm)')
+	plt.title('2D Top-Down Representation')  #set title
+	plt.xlabel('X (cm)')  #set axes label
 	plt.ylabel('Y (cm)')
-	plt.axis([-100, 100, -10, 100])
+	plt.axis([-100, 100, -10, 100])  #set axes range
 	plt.axes().set_aspect('equal')
-	plt.plot(0, 0, 'bo')
+	plt.plot(0, 0, 'bo')  #plot origin
 	plt.draw()
-	colors = ['r.', 'g.', 'm.', 'y.', 'c.']
+
+	colors = ['r.', 'g.', 'm.', 'y.', 'c.']  #different colors for plotting
 	clr = 0
-	sweep = 0
+
+	sweep = 0  #keep track of sweep number
+
 	while 1:
 
+		#read data from arduino, split by '@' to get a list of
+		#distance and pan angle
 		raw_data = ser.readline().strip().split('@')
 
-		raw_dist = float(raw_data[0])
-		w = (raw_dist - 280.0)/120.0
-		dist = .62*w**4 - 2.4*w**3 + 3.4*w**2 - 7.3*w + 18
+		dist = float(raw_data[0])  #get calculated distance
 
-		ang = -math.radians(int(raw_data[1]) - 90)  #convert degrees to radians and shift so that the range is -90 to 90 degrees
+		#convert degrees to radians and shift so that the range is 
+		#-90 to 90 degrees
+		ang = -math.radians(int(raw_data[1]) - 90)
 
 		x = math.sin(ang) * dist * 2.54  #convert from polar coordinates to
-		y = math.cos(ang) * dist * 2.54  #cartesian coodinates and inches to mm
+		y = math.cos(ang) * dist * 2.54  #cartesian coodinates and inches to cm
 
-		if  abs(ang) == math.radians(85):  #cycle the color each sweep
+		#cycle the color and save the figure each sweep
+		if  abs(ang) == math.radians(85):
 			clr = (clr + 1)*(clr != len(colors) - 1)
 			plt.savefig('./Results/test{0}.png'.format(sweep)) 
 			sweep+=1
@@ -37,14 +52,19 @@ def receive():
 		plt.plot(x, y, colors[clr])  #plot the point
 		plt.draw()  #update plot
 
-
-if __name__ == '__main__':
-	ser = serial.Serial('/dev/ttyACM0', 9600)
-	time.sleep(1)
+def establishContact():
+	#flush buffer and wait for ready signal from arduino, 
+	#then send own ready signal
+	time.sleep(.5)
 	ser.flushInput()
-	time.sleep(2)
+	time.sleep(1)
 	print(ser.readline().strip())
 	print('Python ready!')
-	ser.write("Python ready!")
+	ser.write("Python ready!")	
+
+
+if __name__ == '__main__':
+	ser = serial.Serial('/dev/ttyACM0', 9600)  #open serial connection
+	establishContact()
 	receive()
 	ser.close()

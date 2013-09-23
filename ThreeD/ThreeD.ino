@@ -14,8 +14,15 @@ const int panPin = 9;  //pan servo pin
 const int tiltPin = 10;  //tilt servo pin
 const int sensorPin = A0;  //IR range sensor pin
 
-int panPos = 5;  //pan position 
-int tiltPos = 50;  //tilt position
+const int panMin = 20;    //set range of pan angles
+const int panMax = 160;
+const int panRes = 5;     //pan angle between each shot
+const int tiltMin = 60;   //set range of tilt angles
+const int tiltMax = 100;
+const int tiltRes = 5;    //tilt angle between each shot
+
+int panPos;    //define pan position
+int tiltPos;   //define tilt position
 int totDist;  //total distance of 5 shots
 float aveDist;  //average distance of 5 shots
 float realDist;  //voltage converted to real distance
@@ -26,8 +33,8 @@ void setup() {
   panServo.attach(panPin);  //attach the pan servo
   tiltServo.attach(tiltPin);  //attach the tilt servo
   
-  panServo.write(panPos);  //turn pan servo to 5 degrees
-  tiltServo.write(tiltPos);  //turn tilt servo to 45 degrees
+  panServo.write(panMin);  //turn pan servo to starting angle
+  tiltServo.write(tiltMin);  //turn tilt servo to starting angle
   
   establishConnection();  //establish connection with python script
 } 
@@ -43,56 +50,57 @@ void establishConnection() {
 }
 
 
-void shoot() {
+void shoot() {  //take distance reading from IR sensor
   totDist = 0;
   delay(250);
-  for (int i=0; i<5; i++) {
+  for (int i=0; i<5; i++) {  //take 5 shots
     totDist += analogRead(sensorPin);
     delay(50);
   }
-  aveDist = totDist / 5.0;
+  aveDist = totDist / 5.0;  //average reading to eliminate outliers
   
-  float w = (aveDist - 280)/120;
+  float w = (aveDist - 280)/120; //convert IR signal to distance in inches
   realDist = .62*pow(w, 4) - 2.4*pow(w, 3) + 3.4*w*w - 7.3*w + 18;
   
-  Serial.print(realDist);
+  //data is spherical coordinates to be sent to python
+  Serial.print(realDist);  //corrected distance from IR sensor
   Serial.print('@');
-  Serial.print(panPos);
+  Serial.print(panPos);  //pan angle
   Serial.print('@');  
-  Serial.println(tiltPos);
+  Serial.println(tiltPos);  //tilt angle
 } 
  
 void loop() {
-  for (panPos=5; panPos<175; panPos+=5) {
+  for (panPos=panMin; panPos<=panMax; panPos+=panRes) {
     panServo.write(panPos);
-    if (panPos%2 != 0) {
-      for (tiltPos=50; tiltPos<=100; tiltPos+=10) {
+    if (panPos%2 == 0) {
+      for (tiltPos=tiltMin; tiltPos<=tiltMax; tiltPos+=tiltRes) {
         tiltServo.write(tiltPos);
         shoot();
       }
     }
     else {
-      for (tiltPos=100; tiltPos>=50; tiltPos-=10) {
+      for (tiltPos=tiltMax; tiltPos>=tiltMin; tiltPos-=tiltRes) {
         tiltServo.write(tiltPos);
         shoot();
       }
     }
   }
   
-  for (panPos=175; panPos>5; panPos-=5) {
-    panServo.write(panPos);
-    if (panPos%2 != 0) {
-      for (tiltPos=50; tiltPos<=100; tiltPos+=10) {
-        tiltServo.write(tiltPos);
-        shoot();
-      }
-    }
-    else {
-      for (tiltPos=100; tiltPos>=50; tiltPos-=10) {
-        tiltServo.write(tiltPos);
-        shoot();
-      }
-    }
-  }
+//  for (panPos=panMax; panPos>panMin; panPos-=panRes) {
+//    panServo.write(panPos);
+//   if (panPos%2 == 0) {
+//      for (tiltPos=tiltMin; tiltPos<=tiltMax; tiltPos+=tiltRes) {
+//        tiltServo.write(tiltPos);
+//        shoot();
+//      }
+//    }
+//    else {
+//      for (tiltPos=tiltMax; tiltPos>=tiltMin; tiltPos-=tiltRes) {
+//        tiltServo.write(tiltPos);
+//        shoot();
+//      }
+//    }
+//  }
   
 }
