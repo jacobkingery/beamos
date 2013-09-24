@@ -61,8 +61,6 @@ def receive():
 			trigger = 0	
 
 
-
-
 	print('Done receiving')
 
 	#save data in a txt file
@@ -75,7 +73,7 @@ def receive():
 		coord.write('\n')
 		for item in z:
 			coord.write(str(item) + ',')
-			
+
 	#close the serial connection and open a new one so that the arduino resets
 	ser.close()
 	ser2 = serial.Serial('/dev/ttyACM0', 9600)
