@@ -34,7 +34,7 @@ def receive():
 	plt.title('Front View Colormap')  #set title
 	plt.xlabel('X (cm)')  #set axes label
 	plt.ylabel('Z (cm)')
-	plt.axis([-100, 100, -50, 50])  #set axes range
+	plt.axis([-100, 100, -5, 100])  #set axes range
 	plt.axes().set_aspect('equal')
 
 	#set up figure
@@ -79,7 +79,7 @@ def receive():
 		y.append(math.cos(theta) * xyDist * 2.54)
 
 		#check for when it has completed a full sweep
-		if  abs(theta)==math.radians(70) and trigger==0:
+		if  abs(theta)==math.radians(triggerAngle) and trigger==0:
 			trigger += 1
 		if abs(theta) == 0:
 			trigger = 0	
@@ -99,12 +99,12 @@ def receive():
 	max_y = max(y)
 	min_y = min(y)
 
-	heatmap = [((i-min_y) / (max_y-min_y)) for i in y]
+	heatmap = [1 - ((i-min_y) / (max_y-min_y)) for i in y]
 
 	# ax.scatter(x, y, z, heatmap)
-	plt.scatter(x, z, c=heatmap, edgecolors='None')
+	plt.scatter(x, z, c=heatmap, edgecolors='None', cmap=plt.get_cmap('Reds'))
 	plt.show()
-# cmap=plt.get_cmap('Reds')
+
 
 def establishContact():
 	#flush buffer and wait for ready signal from arduino, 
@@ -118,6 +118,7 @@ def establishContact():
 
 
 if __name__ == '__main__':
+	triggerAngle = 30
 	ser = serial.Serial('/dev/ttyACM0', 9600)  #open serial connection
 	establishContact()
 	print('Contact established, receiving data...')

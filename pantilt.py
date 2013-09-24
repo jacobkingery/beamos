@@ -23,7 +23,8 @@ def receive():
 	ax.autoscale(enable=False)
 	ax.set_xlim(-100, 100)  #set axes ranges
 	ax.set_ylim(-10, 100)
-	ax.set_zlim(-50, 50)
+	ax.set_zlim(-5, 100)
+	# ax.set_zlim(-50, 50)
 	ax.scatter(0, 0, 0, s=30, c='b')  #plot origin
 
 	trigger = -1  #trigger to stop after one sweep
@@ -55,7 +56,7 @@ def receive():
 		y.append(math.cos(theta) * xyDist * 2.54)
 
 		#check for when it has completed a full sweep
-		if  abs(theta)==math.radians(70) and trigger==0:
+		if  abs(theta)==math.radians(30) and trigger==0:
 			trigger += 1
 		if abs(theta) == 0:
 			trigger = 0	
