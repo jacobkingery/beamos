@@ -8,8 +8,8 @@ const int panPin = 9;
 const int sensorPin = A0;
 
 int pos;    //servo position 
-int posMin = 5;
-int posMax = 175;
+int posMin = 5;    //set starting angle
+int posMax = 175;  //set end angle
 int totDist;
 float aveDist;
 float realDist;
@@ -34,30 +34,30 @@ void establishConnection() {
 }
 
 
-void shoot() {
+void shoot() {  //take distance measurement
   totDist = 0;
   delay(250);
   for (int i=0; i<5; i++) {
     totDist += analogRead(sensorPin);
     delay(50);
-  }
+  } //take 5 distance readings and average
   aveDist = totDist / 5.0;
   
   float w = (aveDist - 280)/120; //convert IR signal to distance in inches
   realDist = .62*pow(w, 4) - 2.4*pow(w, 3) + 3.4*w*w - 7.3*w + 18;
   
-  Serial.print(realDist);
+  Serial.print(realDist);  //present data to be read in python
   Serial.print('@');
   Serial.println(pos);
 } 
  
-void loop() {
+void loop() { //pan back and forth taking data
   for (pos=posMin; pos<posMax; pos++) {
-    panServo.write(pos);
+    panServo.write(pos);   //pan up to 175
     shoot();
   }
     for (pos=posMax; pos>posMin; pos--) {
-    panServo.write(pos);
+    panServo.write(pos);  //pan back to 5
     shoot();
   }
   
