@@ -17,10 +17,10 @@ const int sensorPin = A0;  //IR range sensor pin
 const int panRange = 60;    //set range of pan angles
 const int panMin = 90 - panRange/2;
 const int panMax = 190 + panRange/2;
-const int panRes = 5;     //pan angle between each shot
-const int tiltMin = 90;   //set range of tilt angles
-const int tiltMax = 130;
-const int tiltRes = 5;    //tilt angle between each shot
+const int panRes = 1;     //pan angle between each shot
+const int tiltMin = 60;   //set range of tilt angles
+const int tiltMax = 110;
+const int tiltRes = 1;    //tilt angle between each shot
 
 int panPos;    //define pan position
 int tiltPos;   //define tilt position

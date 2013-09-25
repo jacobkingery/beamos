@@ -21,9 +21,9 @@ def receive():
 	ax.set_ylabel('Y (cm)')
 	ax.set_zlabel('Z (cm)')
 	ax.autoscale(enable=False)
-	ax.set_xlim(-100, 100)  #set axes ranges
-	ax.set_ylim(-10, 100)
-	ax.set_zlim(-5, 100)
+	ax.set_xlim(-30, 50)  #set axes ranges
+	ax.set_ylim(-10, 90)
+	ax.set_zlim(-15, 30)
 	# ax.set_zlim(-50, 50)
 	ax.scatter(0, 0, 0, s=30, c='b')  #plot origin
 
